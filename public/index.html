@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicLens - Discover Music Through Photos</title>
+    <meta name="description" content="Upload photos and discover music that matches your vibe. AI-powered music recommendations based on the mood and atmosphere of your images." />
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'instagram-pink': '#e91e63',
+                        'instagram-orange': '#ff9800',
+                        'instagram-purple': '#9c27b0',
+                        'primary': '#e91e63',
+                        'secondary': '#f5f5f5',
+                        'muted': '#9e9e9e',
+                        'border': '#e0e0e0',
+                        'card': '#ffffff',
+                        'background': '#ffffff',
+                        'foreground': '#212121'
+                    },
+                    backgroundImage: {
+                        'instagram-gradient': 'linear-gradient(135deg, #e91e63 0%, #ff9800 50%, #9c27b0 100%)',
+                        'instagram-gradient-subtle': 'linear-gradient(135deg, rgba(233, 30, 99, 0.1) 0%, rgba(255, 152, 0, 0.1) 50%, rgba(156, 39, 176, 0.1) 100%)'
+                    },
+                    borderRadius: {
+                        'instagram': '0.75rem'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        .instagram-gradient {
+            background: linear-gradient(135deg, #e91e63 0%, #ff9800 50%, #9c27b0 100%);
+        }
+        
+        .instagram-gradient-subtle {
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.1) 0%, rgba(255, 152, 0, 0.1) 50%, rgba(156, 39, 176, 0.1) 100%);
+        }
+        
+        .instagram-button {
+            background: linear-gradient(135deg, #e91e63 0%, #ff9800 50%, #9c27b0 100%);
+            color: white;
+            font-weight: 600;
+            border-radius: 1rem;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .instagram-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .instagram-button:active {
+            transform: scale(0.95);
+        }
+        
+        .instagram-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .instagram-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .song-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .song-card:hover {
+            transform: scale(1.02);
+        }
+        
+        .bottom-nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        
+        .bottom-nav-tab:hover {
+            transform: scale(1.05);
+        }
+        
+        .bottom-nav-tab.active {
+            color: #e91e63;
+        }
+        
+        .instagram-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .instagram-input:focus {
+            outline: none;
+            border-color: #e91e63;
+            box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground">
+    <!-- Login Page -->
+    <div id="loginPage" class="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+        <div class="w-full max-w-sm space-y-8">
+            <!-- Logo -->
+            <div class="text-center space-y-4">
+                <div class="inline-flex items-center justify-center w-20 h-20 instagram-gradient rounded-2xl">
+                    <div class="flex items-center space-x-1">
+                        <i data-lucide="camera" class="w-8 h-8 text-white"></i>
+                        <i data-lucide="music" class="w-6 h-6 text-white"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-foreground">MusicLens</h1>
+                    <p class="text-muted-foreground text-sm">Discover music through photos</p>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form id="authForm" class="space-y-4">
+                <div class="space-y-3">
+                    <div id="signupFields" class="space-y-3 hidden">
+                        <input type="text" id="fullName" placeholder="Full Name" class="instagram-input" required>
+                        <input type="text" id="username" placeholder="Username" class="instagram-input" required>
+                    </div>
+                    <input type="email" id="email" placeholder="Email or username" class="instagram-input" required>
+                    <input type="password" id="password" placeholder="Password" class="instagram-input" required>
+                    <div id="confirmPasswordField" class="hidden">
+                        <input type="password" id="confirmPassword" placeholder="Confirm Password" class="instagram-input" required>
+                    </div>
+                </div>
+
+                <button type="submit" id="authSubmit" class="w-full instagram-button">
+                    Log In
+                </button>
+            </form>
+
+            <!-- Social Login -->
+            <div class="space-y-3">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-border"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-background text-muted-foreground">OR</span>
+                    </div>
+                </div>
+
+                <button class="w-full rounded-2xl border border-border bg-white hover:bg-secondary py-3 px-4 transition-all duration-200 hover:scale-105 active:scale-95" onclick="goToApp()">
+                    Continue with Google
+                </button>
+                
+                <button class="w-full rounded-2xl border border-border bg-white hover:bg-secondary py-3 px-4 transition-all duration-200 hover:scale-105 active:scale-95" onclick="goToApp()">
+                    Continue with Apple
+                </button>
+            </div>
+
+            <!-- Toggle -->
+            <div class="text-center">
+                <button type="button" id="toggleAuth" class="text-sm text-muted-foreground hover:text-foreground transition-all duration-200 hover:scale-105">
+                    Don't have an account? Sign up
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="min-h-screen bg-background flex flex-col hidden">
+        <!-- Tab Content -->
+        <div class="flex-1 overflow-auto pb-20">
+            <!-- Home Tab -->
+            <div id="homeTab" class="tab-content p-6 space-y-6">
+                <div class="text-center space-y-2">
+                    <h1 class="text-2xl font-bold text-foreground">Discover Music</h1>
+                    <p class="text-muted-foreground">Upload a photo to get AI-powered song recommendations</p>
+                </div>
+
+                <div id="uploadSection" class="space-y-4">
+                    <div class="border-2 border-dashed border-border rounded-2xl p-8 text-center space-y-4">
+                        <div class="w-16 h-16 mx-auto instagram-gradient-subtle rounded-2xl flex items-center justify-center">
+                            <i data-lucide="camera" class="w-8 h-8 text-primary"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-foreground mb-2">Upload Your Photo</h3>
+                            <p class="text-sm text-muted-foreground mb-4">
+                                Take a photo or select from gallery to discover matching music
+                            </p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <button onclick="uploadPhoto()" class="instagram-button">
+                                <i data-lucide="camera" class="w-4 h-4 mr-2 inline"></i>
+                                Take Photo
+                            </button>
+                            <button onclick="uploadPhoto()" class="rounded-2xl border border-border bg-white hover:bg-secondary py-3 px-4 transition-all duration-200 hover:scale-105 active:scale-95">
+                                <i data-lucide="image-plus" class="w-4 h-4 mr-2 inline"></i>
+                                From Gallery
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="photoPreview" class="hidden instagram-card p-0 overflow-hidden">
+                    <img id="uploadedImage" class="w-full h-48 object-cover" alt="Uploaded photo">
+                    <div class="p-4">
+                        <p class="text-sm text-muted-foreground">Photo uploaded successfully!</p>
+                    </div>
+                </div>
+
+                <div id="suggestions" class="space-y-4 hidden">
+                    <h2 class="text-xl font-bold text-foreground">AI Music Suggestions</h2>
+                    <div id="suggestionsList" class="space-y-3">
+                        <!-- Songs will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trending Tab -->
+            <div id="trendingTab" class="tab-content p-6 space-y-6 hidden">
+                <div class="text-center space-y-2">
+                    <div class="inline-flex items-center space-x-2">
+                        <div class="w-8 h-8 instagram-gradient rounded-lg flex items-center justify-center">
+                            <i data-lucide="trending-up" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold text-foreground">Trending Now</h1>
+                    </div>
+                    <p class="text-muted-foreground">Popular songs from Instagram Reels & Spotify</p>
+                </div>
+
+                <div class="instagram-card">
+                    <div class="text-center space-y-2">
+                        <h3 class="font-semibold text-foreground">This Week's Top Growth</h3>
+                        <div class="flex justify-center items-center space-x-1">
+                            <span class="text-2xl font-bold text-primary">+18.5%</span>
+                            <i data-lucide="trending-up" class="w-5 h-5 text-green-500"></i>
+                        </div>
+                        <p class="text-sm text-muted-foreground">Average plays increase</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 class="text-xl font-bold text-foreground">Top Trending Songs</h2>
+                    <div id="trendingList" class="grid grid-cols-1 gap-3">
+                        <!-- Trending songs will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profileTab" class="tab-content p-6 space-y-6 hidden">
+                <div class="text-center space-y-4">
+                    <div class="relative inline-block">
+                        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-primary">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face" 
+                                 alt="Profile" class="w-full h-full object-cover">
+                        </div>
+                        <button class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full instagram-button p-0 flex items-center justify-center">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <h1 class="text-2xl font-bold text-foreground">Alex Johnson</h1>
+                        <p class="text-muted-foreground">@alexj_music</p>
+                    </div>
+
+                    <div class="flex justify-center space-x-8">
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-foreground">3</div>
+                            <div class="text-sm text-muted-foreground">Songs Saved</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-foreground">1.2K</div>
+                            <div class="text-sm text-muted-foreground">Followers</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-foreground">893</div>
+                            <div class="text-sm text-muted-foreground">Following</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button class="flex-1 instagram-button">
+                        <i data-lucide="heart" class="w-4 h-4 mr-2 inline"></i>
+                        Edit Profile
+                    </button>
+                    <button class="rounded-2xl border border-border bg-white hover:bg-secondary p-3">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 class="text-xl font-bold text-foreground flex items-center">
+                        <i data-lucide="music" class="w-5 h-5 mr-2"></i>
+                        Your Music Library
+                    </h2>
+                    
+                    <div id="savedSongs" class="space-y-3">
+                        <!-- Saved songs will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="instagram-card space-y-4">
+                    <h3 class="font-semibold text-foreground">Settings</h3>
+                    <div class="space-y-3">
+                        <button class="w-full text-left p-3 rounded-2xl hover:bg-secondary transition-all duration-200 flex items-center">
+                            <i data-lucide="settings" class="w-4 h-4 mr-3"></i>
+                            Preferences
+                        </button>
+                        <button class="w-full text-left p-3 rounded-2xl hover:bg-secondary transition-all duration-200 flex items-center">
+                            <i data-lucide="music" class="w-4 h-4 mr-3"></i>
+                            Music Genres
+                        </button>
+                        <button onclick="logout()" class="w-full text-left p-3 rounded-2xl hover:bg-red-50 text-red-600 hover:text-red-600 transition-all duration-200 flex items-center">
+                            <i data-lucide="log-out" class="w-4 h-4 mr-3"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Tab -->
+            <div id="infoTab" class="tab-content p-6 space-y-6 hidden">
+                <div class="text-center space-y-2">
+                    <h1 class="text-2xl font-bold text-foreground">About MusicLens</h1>
+                    <p class="text-muted-foreground">AI-powered music discovery through photos</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="instagram-card">
+                        <h3 class="font-semibold text-foreground mb-2">How it works</h3>
+                        <p class="text-sm text-muted-foreground">
+                            Upload a photo and our AI analyzes the mood, atmosphere, and visual elements to suggest music that matches your vibe.
+                        </p>
+                    </div>
+
+                    <div class="instagram-card">
+                        <h3 class="font-semibold text-foreground mb-2">Features</h3>
+                        <ul class="text-sm text-muted-foreground space-y-1">
+                            <li>• AI-powered music recommendations</li>
+                            <li>• Instagram integration</li>
+                            <li>• Trending music discovery</li>
+                            <li>• Personal music library</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-border">
+            <div class="flex justify-around items-center py-2">
+                <button onclick="switchTab('home')" class="bottom-nav-tab active" id="nav-home">
+                    <i data-lucide="home" class="w-6 h-6"></i>
+                    <span class="text-xs mt-1">Home</span>
+                </button>
+                <button onclick="switchTab('trending')" class="bottom-nav-tab text-muted-foreground" id="nav-trending">
+                    <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    <span class="text-xs mt-1">Trending</span>
+                </button>
+                <button onclick="switchTab('profile')" class="bottom-nav-tab text-muted-foreground" id="nav-profile">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                    <span class="text-xs mt-1">Profile</span>
+                </button>
+                <button onclick="switchTab('info')" class="bottom-nav-tab text-muted-foreground" id="nav-info">
+                    <i data-lucide="info" class="w-6 h-6"></i>
+                    <span class="text-xs mt-1">Info</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

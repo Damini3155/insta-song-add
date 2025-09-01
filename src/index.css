@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Instagram-inspired Design System */
+@layer base {
+  :root {
+    /* Base colors - Clean white theme */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 15%;
+
+    /* Card and surface colors */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
+
+    /* Instagram gradient colors */
+    --instagram-pink: 315 100% 72%;
+    --instagram-orange: 45 100% 65%;
+    --instagram-purple: 280 100% 70%;
+    
+    /* Primary using Instagram gradient */
+    --primary: 315 100% 72%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Light gray */
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 0 0% 25%;
+
+    /* Muted - Subtle grays */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 50%;
+
+    /* Accent - Instagram orange */
+    --accent: 45 100% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders and inputs - Very light gray */
+    --border: 0 0% 90%;
+    --input: 0 0% 95%;
+    --ring: 315 100% 72%;
+
+    /* Radius for Instagram-style rounded corners */
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 315 100% 72%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 45 100% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 315 100% 72%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Instagram gradients and custom components */
+@layer components {
+  /* Instagram gradient backgrounds */
+  .instagram-gradient {
+    background: linear-gradient(135deg, hsl(var(--instagram-pink)) 0%, hsl(var(--instagram-orange)) 50%, hsl(var(--instagram-purple)) 100%);
+  }
+  
+  .instagram-gradient-subtle {
+    background: linear-gradient(135deg, hsl(var(--instagram-pink) / 0.1) 0%, hsl(var(--instagram-orange) / 0.1) 50%, hsl(var(--instagram-purple) / 0.1) 100%);
+  }
+
+  /* Instagram button style */
+  .instagram-button {
+    @apply instagram-gradient text-white font-semibold rounded-2xl px-6 py-3 text-center transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95;
+  }
+
+  /* Card with Instagram shadow */
+  .instagram-card {
+    @apply bg-card rounded-2xl p-4 shadow-sm border border-border/50 hover:shadow-md transition-all duration-300;
+  }
+
+  /* Profile avatar with Instagram ring */
+  .instagram-avatar {
+    @apply relative rounded-full overflow-hidden;
+  }
+  
+  .instagram-avatar::before {
+    content: '';
+    @apply absolute inset-0 instagram-gradient rounded-full p-0.5 -z-10;
+  }
+
+  /* Bottom navigation style */
+  .bottom-nav-tab {
+    @apply flex flex-col items-center justify-center p-3 transition-all duration-200 hover:scale-105;
+  }
+
+  .bottom-nav-tab.active {
+    @apply text-primary;
+  }
+
+  /* Song card animations */
+  .song-card {
+    @apply instagram-card hover:scale-105 cursor-pointer active:scale-95;
+  }
+
+  /* Input field Instagram style */
+  .instagram-input {
+    @apply w-full px-4 py-3 bg-input border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
+  }
+}
